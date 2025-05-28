@@ -85,7 +85,7 @@ EOF_END
 lqpanel_menu() {
   while true; do
     clear
-    echo "==== LQPanel quản lý proxy VPS Sing ===="
+    echo "==== LQPanel quản lý proxy VPS ===="
     echo "1) Tạo/Sửa domain proxy"
     echo "2) Xem trạng thái dịch vụ"
     echo "3) Bật cache proxy"
