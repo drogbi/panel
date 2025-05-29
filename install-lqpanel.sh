@@ -159,8 +159,8 @@ MODULE_LIST=(
 )
 for mod in "${MODULE_LIST[@]}"; do
   echo -e "#!/bin/bash
-echo [\$mod] chua duoc viet." > "/opt/lqpanel/modules/\$mod.sh"
-  chmod +x "/opt/lqpanel/modules/$mod.sh"
+echo [${mod}] chua duoc viet." > "/opt/lqpanel/modules/${mod}.sh"
+  chmod +x "/opt/lqpanel/modules/${mod}.sh"
 done
 
 ## Thong bao hoan tat
