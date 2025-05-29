@@ -35,7 +35,7 @@ fi
 ## Update system
 if [[ "$OS" == "ubuntu" ]]; then
   export DEBIAN_FRONTEND=noninteractive
-  apt update -yq && apt upgrade -yq && apt install -yq curl git sudo lsb-release net-tools unzip software-properties-common gnupg2 ca-certificates ufw
+  apt update -yq && apt install -yq curl git sudo lsb-release net-tools unzip software-properties-common gnupg2 ca-certificates ufw
 elif [[ "$OS" == "rocky" || "$OS" == "almalinux" ]]; then
   dnf update -y && dnf install -y epel-release && dnf install -y curl git sudo redhat-lsb-core net-tools unzip policycoreutils-python-utils firewalld gnupg
 fi
@@ -103,6 +103,9 @@ tar xzf /tmp/phpmyadmin.tar.gz --strip-components=1 -C /usr/share/phpmyadmin
 ## Install CSF
 cd /usr/src && curl -s https://download.configserver.com/csf.tgz | tar -xz
 cd csf && sh install.sh
+# Chan firewalld neu co (neu khong thi bo qua)
+systemctl disable firewalld 2>/dev/null || true
+systemctl stop firewalld 2>/dev/null || true
 
 ## Tạo menu chính và alias
 cat > /opt/lqpanel/lqpanel.sh << 'EOF'
@@ -153,6 +156,7 @@ chmod +x /opt/lqpanel/lqpanel.sh
 ln -sf /opt/lqpanel/lqpanel.sh /usr/bin/lqpanel
 
 ## Tạo placeholder cho modules
+mkdir -p /opt/lqpanel/modules
 MODULE_LIST=(
   system_info domain_manage db_manage install_nginx install_php install_mariadb install_phpmyadmin
   php_switch enable_gzip block_country backup healthcheck install_csf site_permission
