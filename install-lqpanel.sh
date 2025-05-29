@@ -122,6 +122,7 @@ show_menu() {
   echo "9) Backup code & database"
   echo "10) Health Check + Don rac"
   echo "11) Cai CSF Firewall"
+  echo "12) Phan quyen website"
   echo "0) Thoat"
   echo "=============================="
 }
@@ -141,6 +142,7 @@ while true; do
     9) bash /opt/lqpanel/modules/backup.sh;;
     10) bash /opt/lqpanel/modules/healthcheck.sh;;
     11) bash /opt/lqpanel/modules/install_csf.sh;;
+    12) bash /opt/lqpanel/modules/site_permission.sh;;
     0) exit;;
     *) echo "Lua chon khong hop le!"; read -p "Nhan Enter...";;
   esac
@@ -151,8 +153,13 @@ chmod +x /opt/lqpanel/lqpanel.sh
 ln -sf /opt/lqpanel/lqpanel.sh /usr/bin/lqpanel
 
 ## Tạo placeholder cho modules
-for mod in system_info domain_manage db_manage install_nginx install_php install_mariadb install_phpmyadmin php_switch enable_gzip block_country backup healthcheck install_csf; do
-  echo -e "#!/bin/bash\necho \"[$mod] chua duoc viet.\"" > "/opt/lqpanel/modules/$mod.sh"
+MODULE_LIST=(
+  system_info domain_manage db_manage install_nginx install_php install_mariadb install_phpmyadmin
+  php_switch enable_gzip block_country backup healthcheck install_csf site_permission
+)
+for mod in "${MODULE_LIST[@]}"; do
+  echo -e "#!/bin/bash
+echo [\$mod] chua duoc viet." > "/opt/lqpanel/modules/\$mod.sh"
   chmod +x "/opt/lqpanel/modules/$mod.sh"
 done
 
