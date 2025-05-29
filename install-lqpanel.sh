@@ -28,7 +28,7 @@ if [[ "$OS" == "ubuntu" ]]; then
   export DEBIAN_FRONTEND=noninteractive
   apt update -yq && apt upgrade -yq && apt install -yq curl git sudo lsb-release net-tools unzip software-properties-common gnupg2 ca-certificates ufw
 elif [[ "$OS" == "rocky" || "$OS" == "almalinux" ]]; then
-  dnf update -y && dnf install -y epel-release && dnf install -y curl git sudo redhat-lsb-core net-tools unzip policycoreutils-python-utils firewalld
+  dnf update -y && dnf install -y epel-release && dnf install -y curl git sudo redhat-lsb-core net-tools unzip policycoreutils-python-utils firewalld gnupg
 fi
 
 ## Create panel folder and modules
@@ -41,13 +41,15 @@ if [[ "$OS" == "ubuntu" ]]; then
   echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" > /etc/apt/sources.list.d/nginx.list
   apt update -yq && apt install -yq nginx
 elif [[ "$OS" == "rocky" || "$OS" == "almalinux" ]]; then
+  curl -o /etc/pki/rpm-gpg/nginx_signing.key https://nginx.org/keys/nginx_signing.key
+  rpm --import /etc/pki/rpm-gpg/nginx_signing.key
   cat > /etc/yum.repos.d/nginx.repo <<EOF
 [nginx-stable]
 name=nginx stable repo
 baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
 gpgcheck=1
 enabled=1
-gpgkey=https://nginx.org/keys/nginx_signing.key
+gpgkey=file:///etc/pki/rpm-gpg/nginx_signing.key
 module_hotfixes=true
 EOF
   dnf install -y nginx
@@ -70,11 +72,13 @@ fi
 if [[ "$OS" == "ubuntu" ]]; then
   apt install -yq mariadb-server mariadb-client
 elif [[ "$OS" == "rocky" || "$OS" == "almalinux" ]]; then
+  curl -o /etc/pki/rpm-gpg/MariaDB-GPG-KEY https://downloads.mariadb.com/MariaDB/MariaDB-Server-GPG-KEY
+  rpm --import /etc/pki/rpm-gpg/MariaDB-GPG-KEY
   cat > /etc/yum.repos.d/MariaDB.repo <<EOF
 [mariadb]
 name = MariaDB
 baseurl = https://downloads.mariadb.com/MariaDB/mariadb-10.6/yum/rhel/\$releasever/\$basearch
-gpgkey=https://downloads.mariadb.com/MariaDB/MariaDB-Server-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MariaDB-GPG-KEY
 gpgcheck=1
 enabled=1
 EOF
