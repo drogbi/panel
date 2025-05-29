@@ -130,7 +130,6 @@ echo "[${mod}] chua co noi dung."
 EOF
   chmod +x "/opt/lqpanel/modules/${mod}.sh"
 done
-done
 
 ## Thong bao hoan tat
 clear
