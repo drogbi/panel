@@ -1,6 +1,6 @@
 #!/bin/bash
 # install-lqpanel.sh
-# Tao boi ChatGPT cho mày
+# LQPANEL v2.1
 
 set -e
 
