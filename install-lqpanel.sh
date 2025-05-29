@@ -1,6 +1,6 @@
 #!/bin/bash
 # install-lqpanel.sh
-# LQPANEL v2.1
+# Tao boi ChatGPT cho mày
 
 set -e
 
@@ -25,7 +25,8 @@ fi
 
 ## Update system
 if [[ "$OS" == "ubuntu" ]]; then
-  apt update -y && apt upgrade -y && apt install -y curl git sudo lsb-release net-tools unzip software-properties-common gnupg2 ca-certificates ufw
+  export DEBIAN_FRONTEND=noninteractive
+  apt update -yq && apt upgrade -yq && apt install -yq curl git sudo lsb-release net-tools unzip software-properties-common gnupg2 ca-certificates ufw
 elif [[ "$OS" == "rocky" ]]; then
   dnf update -y && dnf install -y epel-release && dnf install -y curl git sudo redhat-lsb-core net-tools unzip policycoreutils-python-utils firewalld
 fi
@@ -38,7 +39,7 @@ mkdir -p /opt/lqpanel/modules
 if [[ "$OS" == "ubuntu" ]]; then
   curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
   echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" > /etc/apt/sources.list.d/nginx.list
-  apt update && apt install -y nginx
+  apt update -yq && apt install -yq nginx
 elif [[ "$OS" == "rocky" ]]; then
   cat > /etc/yum.repos.d/nginx.repo <<EOF
 [nginx-stable]
@@ -55,8 +56,8 @@ systemctl enable nginx && systemctl start nginx
 
 ## PHP 7 & 8
 if [[ "$OS" == "ubuntu" ]]; then
-  add-apt-repository ppa:ondrej/php -y && apt update
-  apt install -y php7.4 php7.4-fpm php7.4-mysql php7.4-opcache \
+  add-apt-repository ppa:ondrej/php -y && apt update -yq
+  apt install -yq php7.4 php7.4-fpm php7.4-mysql php7.4-opcache \
                  php8.2 php8.2-fpm php8.2-mysql php8.2-opcache
 elif [[ "$OS" == "rocky" ]]; then
   dnf install -y dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
@@ -67,7 +68,7 @@ fi
 
 ## MariaDB
 if [[ "$OS" == "ubuntu" ]]; then
-  apt install -y mariadb-server mariadb-client
+  apt install -yq mariadb-server mariadb-client
 elif [[ "$OS" == "rocky" ]]; then
   cat > /etc/yum.repos.d/MariaDB.repo <<EOF
 [mariadb]
