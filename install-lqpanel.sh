@@ -74,7 +74,7 @@ tar xzf /tmp/phpmyadmin.tar.gz --strip-components=1 -C /usr/share/phpmyadmin
 
 ## Tao menu don gian
 mkdir -p /opt/lqpanel
-cat > /opt/lqpanel/lqpanel.sh << 'EOF'
+cat > /opt/lqpanel/lqpanel.sh <<EOF
 #!/bin/bash
 
 show_menu() {
