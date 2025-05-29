@@ -90,7 +90,7 @@ gpgkey=file:///etc/pki/rpm-gpg/MariaDB-GPG-KEY
 gpgcheck=1
 enabled=1
 EOF
-  dnf install -y MariaDB-server MariaDB-client
+  dnf install -y mariadb-server mariadb
 fi
 systemctl enable mariadb && systemctl start mariadb
 
