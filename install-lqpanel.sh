@@ -162,3 +162,6 @@ echo "===================================="
 echo "Cai dat hoan tat!"
 echo "Chay lenh 'lqpanel' de bat dau menu."
 echo "===================================="
+echo "VPS se tu dong khoi dong lai sau 5 giay..."
+sleep 5
+reboot
