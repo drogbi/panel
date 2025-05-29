@@ -4,14 +4,23 @@
 
 set -e
 
-## Cho apt/dpkg khac ket thuc neu co (Ubuntu)
+## Cho apt/dpkg khac ket thuc neu co (Ubuntu) voi timeout 60s
 if [[ -f /etc/debian_version ]]; then
-  while fuser /var/lib/dpkg/lock >/dev/null 2>&1 || \
-        fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || \
-        fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-    echo "Dang co tien trinh apt/dpkg khac dang chay. Doi 5s..."
+  echo "Dang kiem tra tien trinh apt/dpkg..."
+  TIMEOUT=60
+  while [[ $TIMEOUT -gt 0 ]] && {
+    fuser /var/lib/dpkg/lock >/dev/null 2>&1 ||
+    fuser /var/lib/apt/lists/lock >/dev/null 2>&1 ||
+    fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ;
+  }; do
+    echo "Tien trinh apt/dpkg dang chay, doi 5s ($TIMEOUT s con lai)"
     sleep 5
+    TIMEOUT=$((TIMEOUT - 5))
   done
+  if [[ $TIMEOUT -le 0 ]]; then
+    echo "❌ Qua thoi gian cho (60s), tien trinh apt van bi lock. Vui long thu lai sau."
+    exit 1
+  fi
 fi
 
 ## Check OS
@@ -34,13 +43,12 @@ fi
 ## Create panel folder and modules
 mkdir -p /opt/lqpanel/modules
 
-## Install base components
-## Nginx
+## Install Nginx
 if [[ "$OS" == "ubuntu" ]]; then
   curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
-  echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" > /etc/apt/sources.list.d/nginx.list
+  echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
   apt update -yq && apt install -yq nginx
-elif [[ "$OS" == "rocky" || "$OS" == "almalinux" ]]; then
+else
   curl -o /etc/pki/rpm-gpg/nginx_signing.key https://nginx.org/keys/nginx_signing.key
   rpm --import /etc/pki/rpm-gpg/nginx_signing.key
   cat > /etc/yum.repos.d/nginx.repo <<EOF
@@ -56,22 +64,22 @@ EOF
 fi
 systemctl enable nginx && systemctl start nginx
 
-## PHP 7 & 8
+## Install PHP
 if [[ "$OS" == "ubuntu" ]]; then
   add-apt-repository ppa:ondrej/php -y && apt update -yq
   apt install -yq php7.4 php7.4-fpm php7.4-mysql php7.4-opcache \
                  php8.2 php8.2-fpm php8.2-mysql php8.2-opcache
-elif [[ "$OS" == "rocky" || "$OS" == "almalinux" ]]; then
+else
   dnf install -y dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
   dnf module reset php -y
   dnf module enable php:remi-7.4 -y && dnf install -y php php-fpm php-mysqlnd php-opcache
   dnf module enable php:remi-8.2 -y && dnf install -y php82 php82-php-fpm php82-php-mysqlnd php82-php-opcache
 fi
 
-## MariaDB
+## Install MariaDB
 if [[ "$OS" == "ubuntu" ]]; then
   apt install -yq mariadb-server mariadb-client
-elif [[ "$OS" == "rocky" || "$OS" == "almalinux" ]]; then
+else
   curl -o /etc/pki/rpm-gpg/MariaDB-GPG-KEY https://downloads.mariadb.com/MariaDB/MariaDB-Server-GPG-KEY
   rpm --import /etc/pki/rpm-gpg/MariaDB-GPG-KEY
   cat > /etc/yum.repos.d/MariaDB.repo <<EOF
@@ -86,13 +94,13 @@ EOF
 fi
 systemctl enable mariadb && systemctl start mariadb
 
-## phpMyAdmin
+## Install phpMyAdmin
 wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz -O /tmp/phpmyadmin.tar.gz
 mkdir -p /usr/share/phpmyadmin
 rm -rf /usr/share/phpmyadmin/*
 tar xzf /tmp/phpmyadmin.tar.gz --strip-components=1 -C /usr/share/phpmyadmin
 
-## CSF Firewall
+## Install CSF
 cd /usr/src && curl -s https://download.configserver.com/csf.tgz | tar -xz
 cd csf && sh install.sh
 
