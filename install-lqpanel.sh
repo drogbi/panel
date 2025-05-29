@@ -124,9 +124,12 @@ ln -sf /opt/lqpanel/lqpanel.sh /usr/bin/lqpanel
 ## Tao module placeholder
 mkdir -p /opt/lqpanel/modules
 for mod in system_info domain_manage db_manage backup install_nginx install_php install_mariadb install_phpmyadmin php_switch enable_gzip block_country healthcheck install_csf site_permission; do
-  echo -e "#!/bin/bash
-echo '[${mod}] chua co noi dung.'" > "/opt/lqpanel/modules/${mod}.sh"
+  cat > "/opt/lqpanel/modules/${mod}.sh" <<EOF
+#!/bin/bash
+echo "[${mod}] chua co noi dung."
+EOF
   chmod +x "/opt/lqpanel/modules/${mod}.sh"
+done
 done
 
 ## Thong bao hoan tat
