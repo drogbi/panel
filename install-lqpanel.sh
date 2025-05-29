@@ -4,6 +4,16 @@
 
 set -e
 
+## Cho apt/dpkg khac ket thuc neu co (Ubuntu)
+if [[ -f /etc/debian_version ]]; then
+  while fuser /var/lib/dpkg/lock >/dev/null 2>&1 || \
+        fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || \
+        fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+    echo "Dang co tien trinh apt/dpkg khac dang chay. Doi 5s..."
+    sleep 5
+  done
+fi
+
 ## Check OS
 OS="$(. /etc/os-release && echo "$ID")"
 VERSION_ID="$(. /etc/os-release && echo "$VERSION_ID")"
